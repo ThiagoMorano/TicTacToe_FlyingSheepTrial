@@ -3,9 +3,12 @@ let scene;
 let renderer;
 let pointLight;
 let ambientLight;
-//let ui;
 let fontLoader;
 let textGameEnd;
+// let ui;
+// let uiRectangle;
+// let uiText;
+
 
 const markerGeometry = new THREE.DodecahedronGeometry();
 const playerMarkerMaterial = new THREE.MeshLambertMaterial( {color: 0x5dbcd2});
@@ -74,22 +77,26 @@ function init() {
     startGame();
     
 
-
-    // ui = new ThreeUI(renderer.domElement, 720);
-    // // Place a Pretty Pink 500x150 rectangle in the center of the screen
-    // const rectangle = ui.createRectangle('#FF6D92', 0, 0, 500, 100);
-    // rectangle.anchor.x = ThreeUI.anchors.center;
-    // rectangle.anchor.y = ThreeUI.anchors.center;
-
-    // // Add some text to the rectangle
-    // const text = ui.createText('BEST BUTTON EVER', 40, 'Arial', 'white');
-    // text.textAlign = 'center';
-    // text.textBaseline = 'middle';
-    // text.anchor.x = ThreeUI.anchors.center;
-    // text.anchor.y = ThreeUI.anchors.center;
-
-    // text.parent = rectangle;
+    //createScoreUI();
+    
 }
+
+// function createScoreUI() {
+//     ui = new ThreeUI(renderer.domElement, 720);
+//     uiRectangle = ui.createRectangle('#000000', 0, 0, 500, 100);
+//     uiRectangle.alpha = 0;
+//     uiRectangle.anchor.x = ThreeUI.anchors.center;
+//     uiRectangle.anchor.y = ThreeUI.anchors.center;
+
+//     // Add some text to the rectangle
+//     uiText = ui.createText('Score', 40, 'Arial', 'white');
+//     uiText.textAlign = 'center';
+//     uiText.textBaseline = 'middle';
+//     uiText.anchor.x = ThreeUI.anchors.center;
+//     uiText.anchor.y = ThreeUI.anchors.center;
+
+//     uiText.parent = uiRectangle;
+//}
 
 function startGame() {
     hasFinished = false;
