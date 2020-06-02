@@ -3,6 +3,13 @@ let scene;
 let renderer;
 let pointLight;
 let ambientLight;
+//let ui;
+let fontLoader;
+let textGameEnd;
+
+const markerGeometry = new THREE.DodecahedronGeometry();
+const playerMarkerMaterial = new THREE.MeshLambertMaterial( {color: 0x5dbcd2});
+const enemyMarkerMaterial = new THREE.MeshLambertMaterial( {color: 0xc7382e});
 
 
 let playfield = []; // 3x3 Matrix, initialized with 0s for empty spaces
@@ -57,6 +64,25 @@ function init() {
             playfield[i][j] = empty;
         }
     }
+
+
+    // ui = new ThreeUI(renderer.domElement, 720);
+    // // Place a Pretty Pink 500x150 rectangle in the center of the screen
+    // const rectangle = ui.createRectangle('#FF6D92', 0, 0, 500, 100);
+    // rectangle.anchor.x = ThreeUI.anchors.center;
+    // rectangle.anchor.y = ThreeUI.anchors.center;
+
+    // // Add some text to the rectangle
+    // const text = ui.createText('BEST BUTTON EVER', 40, 'Arial', 'white');
+    // text.textAlign = 'center';
+    // text.textBaseline = 'middle';
+    // text.anchor.x = ThreeUI.anchors.center;
+    // text.anchor.y = ThreeUI.anchors.center;
+
+    // text.parent = rectangle;
+
+
+    fontLoader =  new THREE.FontLoader();
 }
 
 
@@ -78,6 +104,7 @@ function update() {
 }
 
 function render() {
+    //ui.render(renderer);
     renderer.render(scene,camera);
 }
 
@@ -134,11 +161,13 @@ function onMouseDown(event) {
                 trySelectField(positionSelected.row, positionSelected.column, playerMarker);
             }
         }
+    } else {
+        restartGame();
     }
 }
 
 function validateClick(mouse) {
-    // Here I went with the first solution that came to mind after playing around with the event clicks
+    // Here I went with the first solution that came to mind after playing around with the event clicks.
     // However, it for sure doesn't look that great. How would this be done in a better way?
     let clickRadiusVertical = playfieldScale / 8;
     let clickRadiusHorizontal = playfieldScale / 12;
@@ -219,9 +248,7 @@ function spawnObjectInPosition(row, column, marker) {
 }
 
 function PlayerObject() {
-    geometry = new THREE.DodecahedronGeometry();
-    material = new THREE.MeshLambertMaterial( {color: 0x5dbcd2});
-    this.mesh = new THREE.Mesh(geometry, material);
+    this.mesh = new THREE.Mesh(markerGeometry, playerMarkerMaterial);
     this.update = function() {
         this.mesh.rotation.x += 0.005;
         this.mesh.rotation.y += 0.005;
@@ -229,9 +256,7 @@ function PlayerObject() {
 }
 
 function EnemyObject() {
-    geometry = new THREE.DodecahedronGeometry();
-    material = new THREE.MeshLambertMaterial( {color: 0xc7382e});
-    this.mesh = new THREE.Mesh(geometry, material);
+    this.mesh = new THREE.Mesh(markerGeometry, enemyMarkerMaterial);
     this.update = function() {
         this.mesh.rotation.x -= 0.005;
         this.mesh.rotation.y -= 0.005;
@@ -295,14 +320,95 @@ function checkForDraw() {
 
 function playerWins() {
     console.log("Player won");
+    fontLoader.load('fonts/helvetiker_regular.typeface.json', function ( font ) {
+        let textGeometry = new THREE.TextGeometry( "WIN", {
+            font: font,
+            size: 15,
+            height: 5,
+            curveSegments: 16,
+            bevelEnabled: true,
+            bevelThickness: 1,
+            bevelSize: 1,
+            bevelOffset: 0,
+            bevelSegments: 1
+        });
+      
+        let textMaterial = new THREE.MeshPhongMaterial( 
+          { color: 0xffffff, specular: 0xffffff }
+        );
+      
+        let textMesh = new THREE.Mesh( textGeometry, textMaterial );
+        textMesh.position.x = -2;
+        textMesh.position.y = -0.5;
+        textMesh.position.z = 1;
+
+        textMesh.scale.x = 0.1;
+        textMesh.scale.y = 0.1;
+        textMesh.scale.z = 0.1;
+        scene.add( textMesh );
+      });
 }
 
 function enemyWins() {
     console.log("Enemy won");
+    fontLoader.load('fonts/helvetiker_regular.typeface.json', function ( font ) {
+        let textGeometry = new THREE.TextGeometry( "LOSE", {
+            font: font,
+            size: 10,
+            height: 5,
+            curveSegments: 12,
+            bevelEnabled: true,
+            bevelThickness: 1,
+            bevelSize: 1,
+            bevelOffset: 0,
+            bevelSegments: 1
+        });
+      
+        let textMaterial = new THREE.MeshPhongMaterial( 
+          { color: 0xffffff, specular: 0xffffff }
+        );
+      
+        let textMesh = new THREE.Mesh( textGeometry, textMaterial );
+        textMesh.position.x = -1.7;
+        textMesh.position.y = 0;
+        textMesh.position.z = 1;
+
+        textMesh.scale.x = 0.1;
+        textMesh.scale.y = 0.1;
+        textMesh.scale.z = 0.1;
+        scene.add( textMesh );
+      });
 }
 
 function gameDraw() {
     console.log("Draw");
+    fontLoader.load('fonts/helvetiker_regular.typeface.json', function ( font ) {
+        let textGeometry = new THREE.TextGeometry( "DRAW", {
+            font: font,
+            size: 10,
+            height: 5,
+            curveSegments: 12,
+            bevelEnabled: true,
+            bevelThickness: 1,
+            bevelSize: 1,
+            bevelOffset: 0,
+            bevelSegments: 1
+        });
+      
+        let textMaterial = new THREE.MeshPhongMaterial( 
+          { color: 0xffffff, specular: 0xffffff }
+        );
+      
+        let textMesh = new THREE.Mesh( textGeometry, textMaterial );
+        textMesh.position.x = -1.9;
+        textMesh.position.y = 0;
+        textMesh.position.z = 1;
+
+        textMesh.scale.x = 0.1;
+        textMesh.scale.y = 0.1;
+        textMesh.scale.z = 0.1;
+        scene.add( textMesh );
+      });
 }
 
 //#endregion WinCon
