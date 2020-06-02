@@ -29,6 +29,13 @@ let numberOfMovesTaken;
 let playerScore = 0;
 let enemyScore = 0;
 
+let hasPlayerWon = false;
+let hasEnemyWon = false;
+let defaultSpeed =  0.005;
+let winSpeed = 0.015;
+let loseSpeed = 0.0025;
+
+
 
 
 init();
@@ -88,6 +95,8 @@ function startGame() {
     hasFinished = false;
     playerTurn = true;
     numberOfMovesTaken = 0; 
+    hasPlayerWon = false;
+    hasEnemyWon = false;
 
     // Populate playfield with empty
     for(let i = 0; i<3; i++) {
@@ -178,19 +187,6 @@ function onMouseDown(event) {
     }
 }
 
-function restartGame() {
-    // Is this enough to dispose the objects?
-    for(let i = 0; i<objectsInPlayfield.length; i++) {
-        scene.remove(objectsInPlayfield[i].mesh);
-    }
-    objectsInPlayfield = [];
-
-    scene.remove(textGameEnd);
-
-    startGame();
-}
-
-
 function validateClick(mouse) {
     // Here I went with the first solution that came to mind after playing around with the event clicks.
     // However, it for sure doesn't look that great. How would this be done in a better way?
@@ -275,19 +271,34 @@ function spawnObjectInPosition(row, column, marker) {
 function PlayerObject() {
     this.mesh = new THREE.Mesh(markerGeometry, playerMarkerMaterial);
     this.update = function() {
-        this.mesh.rotation.x += 0.005;
-        this.mesh.rotation.y += 0.005;
+        if(hasPlayerWon) {
+            this.mesh.rotation.x += winSpeed;
+            this.mesh.rotation.y += winSpeed;
+        } else if(hasEnemyWon) {
+            this.mesh.rotation.x -= loseSpeed;
+            this.mesh.rotation.y -= loseSpeed;
+        } else {
+            this.mesh.rotation.x += defaultSpeed;
+            this.mesh.rotation.y += defaultSpeed;
+        }        
     }
 }
 
 function EnemyObject() {
     this.mesh = new THREE.Mesh(markerGeometry, enemyMarkerMaterial);
     this.update = function() {
-        this.mesh.rotation.x -= 0.005;
-        this.mesh.rotation.y -= 0.005;
+        if(hasEnemyWon) {
+            this.mesh.rotation.x -= winSpeed;
+            this.mesh.rotation.y -= winSpeed;
+        } else if(hasPlayerWon) {
+            this.mesh.rotation.x += loseSpeed;
+            this.mesh.rotation.y += loseSpeed;
+        } else {
+            this.mesh.rotation.x -= defaultSpeed;
+            this.mesh.rotation.y -= defaultSpeed;
+        }    
     }
 }
-
 //#endregion Input & Marking Fields
 
 //#region WinCon
@@ -345,7 +356,9 @@ function checkForDraw() {
 
 function playerWins() {
     playerScore++;
+    hasPlayerWon = true;
     console.log(`Player won, score ${playerScore} x ${enemyScore}`);
+
     fontLoader.load('fonts/helvetiker_regular.typeface.json', function ( font ) {
         let textGeometry = new THREE.TextGeometry( "WIN", {
             font: font,
@@ -377,7 +390,9 @@ function playerWins() {
 
 function enemyWins() {
     enemyScore++;
+    hasEnemyWon = true;
     console.log(`Enemy won, score ${playerScore} x ${enemyScore}`);
+
     fontLoader.load('fonts/helvetiker_regular.typeface.json', function ( font ) {
         let textGeometry = new THREE.TextGeometry( "LOSE", {
             font: font,
@@ -436,6 +451,18 @@ function gameDraw() {
         textGameEnd.scale.z = 0.1;
         scene.add( textGameEnd );
       });
+}
+
+function restartGame() {
+    // Is this enough to dispose the objects?
+    for(let i = 0; i<objectsInPlayfield.length; i++) {
+        scene.remove(objectsInPlayfield[i].mesh);
+    }
+    objectsInPlayfield = [];
+
+    scene.remove(textGameEnd);
+
+    startGame();
 }
 
 //#endregion WinCon
