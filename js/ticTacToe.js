@@ -24,8 +24,9 @@ init();
 gameLoop();
 
 function init() {
-    //document.onkeydown = handleInput;
-    document.addEventListener('mousedown', onMouseDown, false);
+    //document.onkeydown = placeHolderInputHandler;
+    window.addEventListener('mousedown', onMouseDown, false);
+    window.addEventListener('resize', onResize);
 
     // Scene setup
     scene = new THREE.Scene();
@@ -37,6 +38,7 @@ function init() {
     renderer = new THREE.WebGLRenderer();
     renderer.setSize( window.innerWidth, window.innerHeight );
     document.body.appendChild(renderer.domElement);
+
     
     ambientLight = new THREE.AmbientLight(0xffffff, 0.2)
     scene.add(ambientLight);
@@ -74,6 +76,14 @@ function update() {
 
 function render() {
     renderer.render(scene,camera);
+}
+
+function onResize() {
+    let width = window.innerWidth;
+    let height = window.innerHeight;
+    renderer.setSize(width, height);
+    camera.aspect = width / height;
+    camera.updateProjectionMatrix();
 }
 
 //#region Input & Marking Fields
@@ -117,46 +127,41 @@ function validateClick(mouse) {
     //console.log(`Selection at (${row}, ${column})`);
 }
 
-function handleInput(keyEvent) {
+function placeHolderInputHandler(keyEvent) {
     if(!hasFinished) {
-
-        placeHolderInputHandler(keyEvent);
+        if(playerTurn) {
+            if(keyEvent.keyCode == 49) { // 1
+                trySelectField(0,0, playerMarker);
+            }
+            if(keyEvent.keyCode == 50) { // 2
+                trySelectField(0,1, playerMarker);
+            }
+            if(keyEvent.keyCode == 51) { // 3
+                trySelectField(0,2, playerMarker);
+            }
+            if(keyEvent.keyCode == 52) { // 4
+                trySelectField(1,0, playerMarker);
+            }
+            if(keyEvent.keyCode == 53) { // 5
+                trySelectField(1,1, playerMarker);
+            }
+            if(keyEvent.keyCode == 54) { // 6
+                trySelectField(1,2, playerMarker);
+            }
+            if(keyEvent.keyCode == 55) { // 7
+                trySelectField(2,0, playerMarker);
+            }
+            if(keyEvent.keyCode == 56) { // 8
+                trySelectField(2,1, playerMarker);
+            }
+            if(keyEvent.keyCode == 57) { // 9
+                trySelectField(2,2, playerMarker);
+            }
+        }
     }
     else {
         // restart();
     }    
-}
-
-function placeHolderInputHandler(keyEvent) {
-    if(playerTurn) {
-        if(keyEvent.keyCode == 49) { // 1
-            trySelectField(0,0, playerMarker);
-        }
-        if(keyEvent.keyCode == 50) { // 2
-            trySelectField(0,1, playerMarker);
-        }
-        if(keyEvent.keyCode == 51) { // 3
-            trySelectField(0,2, playerMarker);
-        }
-        if(keyEvent.keyCode == 52) { // 4
-            trySelectField(1,0, playerMarker);
-        }
-        if(keyEvent.keyCode == 53) { // 5
-            trySelectField(1,1, playerMarker);
-        }
-        if(keyEvent.keyCode == 54) { // 6
-            trySelectField(1,2, playerMarker);
-        }
-        if(keyEvent.keyCode == 55) { // 7
-            trySelectField(2,0, playerMarker);
-        }
-        if(keyEvent.keyCode == 56) { // 8
-            trySelectField(2,1, playerMarker);
-        }
-        if(keyEvent.keyCode == 57) { // 9
-            trySelectField(2,2, playerMarker);
-        }
-    }
 }
 
 function enemyMove() {
