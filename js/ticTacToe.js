@@ -7,9 +7,6 @@ let ambientLight;
 let fontLoader;
 let textGameEnd;
 
-let playerScore = 0;
-let enemyScore = 0;
-
 const markerGeometry = new THREE.DodecahedronGeometry();
 const playerMarkerMaterial = new THREE.MeshLambertMaterial( {color: 0x5dbcd2});
 const enemyMarkerMaterial = new THREE.MeshLambertMaterial( {color: 0xc7382e});
@@ -24,11 +21,14 @@ const playfieldScale = 2.5;
 let objectsInPlayfield = []; // Holds the 3D representations of the markers
 let playfieldBarriers = [];
 
-// Global game state
-// Also set in startGame()
-let hasFinished = false;
-let playerTurn = true;
-let numberOfMovesTaken = 0;
+// Game state
+// Set in startGame()
+let hasFinished;
+let playerTurn;
+let numberOfMovesTaken;
+let playerScore = 0;
+let enemyScore = 0;
+
 
 
 init();
@@ -179,9 +179,12 @@ function onMouseDown(event) {
 }
 
 function restartGame() {
+    // Is this enough to dispose the objects?
     for(let i = 0; i<objectsInPlayfield.length; i++) {
         scene.remove(objectsInPlayfield[i].mesh);
     }
+    objectsInPlayfield = [];
+
     scene.remove(textGameEnd);
 
     startGame();
