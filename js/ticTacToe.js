@@ -5,9 +5,9 @@ let pointLight;
 let ambientLight;
 let fontLoader;
 let textGameEnd;
-// let ui;
-// let uiRectangle;
-// let uiText;
+let ui;
+let uiRectangle;
+let uiText;
 
 
 const markerGeometry = new THREE.DodecahedronGeometry();
@@ -81,22 +81,22 @@ function init() {
     
 }
 
-// function createScoreUI() {
-//     ui = new ThreeUI(renderer.domElement, 720);
-//     uiRectangle = ui.createRectangle('#000000', 0, 0, 500, 100);
-//     uiRectangle.alpha = 0;
-//     uiRectangle.anchor.x = ThreeUI.anchors.center;
-//     uiRectangle.anchor.y = ThreeUI.anchors.center;
+function createScoreUI() {
+    ui = new ThreeUI(renderer.domElement, 720);
+    uiRectangle = ui.createRectangle('#000000', 0, 0, 500, 100);
+    uiRectangle.alpha = 0;
+    uiRectangle.anchor.x = ThreeUI.anchors.center;
+    uiRectangle.anchor.y = ThreeUI.anchors.center;
 
-//     // Add some text to the rectangle
-//     uiText = ui.createText('Score', 40, 'Arial', 'white');
-//     uiText.textAlign = 'center';
-//     uiText.textBaseline = 'middle';
-//     uiText.anchor.x = ThreeUI.anchors.center;
-//     uiText.anchor.y = ThreeUI.anchors.center;
+    // Add some text to the rectangle
+    uiText = ui.createText('Score', 40, 'Arial', 'white');
+    uiText.textAlign = 'center';
+    uiText.textBaseline = 'middle';
+    uiText.anchor.x = ThreeUI.anchors.center;
+    uiText.anchor.y = ThreeUI.anchors.center;
 
-//     uiText.parent = uiRectangle;
-//}
+    uiText.parent = uiRectangle;
+}
 
 function startGame() {
     hasFinished = false;
