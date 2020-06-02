@@ -13,7 +13,7 @@ const enemyMarker = 2;
 const playfieldScale = 2.5;
 
 let objectsInPlayfield = []; // Holds the 3D representations of the markers
-
+let playfieldBarriers = [];
 
 let hasFinished = false;
 let playerTurn = true;
@@ -24,7 +24,7 @@ init();
 gameLoop();
 
 function init() {
-    //document.onkeydown = placeHolderInputHandler;
+    //window.onkeydown = placeHolderInputHandler;
     window.addEventListener('mousedown', onMouseDown, false);
     window.addEventListener('resize', onResize);
 
@@ -39,13 +39,16 @@ function init() {
     renderer.setSize( window.innerWidth, window.innerHeight );
     document.body.appendChild(renderer.domElement);
 
-    
+    // Lights
     ambientLight = new THREE.AmbientLight(0xffffff, 0.2)
     scene.add(ambientLight);
 
     pointLight = new THREE.PointLight(0xffffff);
     pointLight.position.set(-10, 15, 50);
     scene.add(pointLight);
+
+    // Playfield
+    addPlayfieldBarriers();
 
     // Populate playfield with empty
     for(let i = 0; i<3; i++) {
@@ -86,10 +89,40 @@ function onResize() {
     camera.updateProjectionMatrix();
 }
 
+function addPlayfieldBarriers() {
+    playfieldBarriers[0] = new PlayfieldBarrier();
+    playfieldBarriers[0].mesh.scale.x = 0.01;
+    playfieldBarriers[0].mesh.scale.y = 6;
+    playfieldBarriers[0].mesh.position.x = -playfieldScale/2;
+    playfieldBarriers[1] = new PlayfieldBarrier();
+    playfieldBarriers[1].mesh.scale.x = 0.01;
+    playfieldBarriers[1].mesh.scale.y = 6;
+    playfieldBarriers[1].mesh.position.x = playfieldScale/2;
+    playfieldBarriers[2] = new PlayfieldBarrier();
+    playfieldBarriers[2].mesh.scale.x = 6;
+    playfieldBarriers[2].mesh.scale.y = 0.01;
+    playfieldBarriers[2].mesh.position.y = -playfieldScale/2;
+    playfieldBarriers[3] = new PlayfieldBarrier();
+    playfieldBarriers[3].mesh.scale.x = 6;
+    playfieldBarriers[3].mesh.scale.y = 0.01;
+    playfieldBarriers[3].mesh.position.y = playfieldScale/2;
+
+    scene.add(playfieldBarriers[0].mesh);
+    scene.add(playfieldBarriers[1].mesh);
+    scene.add(playfieldBarriers[2].mesh);
+    scene.add(playfieldBarriers[3].mesh);
+}
+
+function PlayfieldBarrier() {
+    geometry = new THREE.CubeGeometry();
+    material = new THREE.MeshLambertMaterial( {color: 0xf0f0f0});
+    this.mesh = new THREE.Mesh(geometry, material);
+}
+
 //#region Input & Marking Fields
 function onMouseDown(event) {
     if(!hasFinished) {
-            if(playerTurn) {
+        if(playerTurn) {
             let mouse= new THREE.Vector2();
             mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
             mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
@@ -105,63 +138,29 @@ function onMouseDown(event) {
 }
 
 function validateClick(mouse) {
-    let clickRadius = playfieldScale / 10;
+    // Here I went with the first solution that came to mind after playing around with the event clicks
+    // However, it for sure doesn't look that great. How would this be done in a better way?
+    let clickRadiusVertical = playfieldScale / 8;
+    let clickRadiusHorizontal = playfieldScale / 12;
     let row;
     let column;
-    if(mouse.x < -clickRadius) {
+    if(mouse.x < -clickRadiusHorizontal) {
         column = 0;
-    } else if (mouse.x > clickRadius) {
+    } else if (mouse.x > clickRadiusHorizontal) {
         column = 2;
     } else {
         column = 1;
     }
 
-    if(mouse.y < -clickRadius) {
+    if(mouse.y < -clickRadiusVertical) {
         row = 2;
-    } else if (mouse.y > clickRadius) {
+    } else if (mouse.y > clickRadiusVertical) {
         row  = 0;
     } else {
         row = 1;
     }
     return {row, column};
     //console.log(`Selection at (${row}, ${column})`);
-}
-
-function placeHolderInputHandler(keyEvent) {
-    if(!hasFinished) {
-        if(playerTurn) {
-            if(keyEvent.keyCode == 49) { // 1
-                trySelectField(0,0, playerMarker);
-            }
-            if(keyEvent.keyCode == 50) { // 2
-                trySelectField(0,1, playerMarker);
-            }
-            if(keyEvent.keyCode == 51) { // 3
-                trySelectField(0,2, playerMarker);
-            }
-            if(keyEvent.keyCode == 52) { // 4
-                trySelectField(1,0, playerMarker);
-            }
-            if(keyEvent.keyCode == 53) { // 5
-                trySelectField(1,1, playerMarker);
-            }
-            if(keyEvent.keyCode == 54) { // 6
-                trySelectField(1,2, playerMarker);
-            }
-            if(keyEvent.keyCode == 55) { // 7
-                trySelectField(2,0, playerMarker);
-            }
-            if(keyEvent.keyCode == 56) { // 8
-                trySelectField(2,1, playerMarker);
-            }
-            if(keyEvent.keyCode == 57) { // 9
-                trySelectField(2,2, playerMarker);
-            }
-        }
-    }
-    else {
-        // restart();
-    }    
 }
 
 function enemyMove() {
@@ -241,7 +240,6 @@ function EnemyObject() {
 
 //#endregion Input & Marking Fields
 
-
 //#region WinCon
 function checkEndOfGame() {
     if(checkWinConditionFor(playerMarker)) {
@@ -308,3 +306,41 @@ function gameDraw() {
 }
 
 //#endregion WinCon
+
+
+function placeHolderInputHandler(keyEvent) {
+    if(!hasFinished) {
+        if(playerTurn) {
+            if(keyEvent.keyCode == 49) { // 1
+                trySelectField(0,0, playerMarker);
+            }
+            if(keyEvent.keyCode == 50) { // 2
+                trySelectField(0,1, playerMarker);
+            }
+            if(keyEvent.keyCode == 51) { // 3
+                trySelectField(0,2, playerMarker);
+            }
+            if(keyEvent.keyCode == 52) { // 4
+                trySelectField(1,0, playerMarker);
+            }
+            if(keyEvent.keyCode == 53) { // 5
+                trySelectField(1,1, playerMarker);
+            }
+            if(keyEvent.keyCode == 54) { // 6
+                trySelectField(1,2, playerMarker);
+            }
+            if(keyEvent.keyCode == 55) { // 7
+                trySelectField(2,0, playerMarker);
+            }
+            if(keyEvent.keyCode == 56) { // 8
+                trySelectField(2,1, playerMarker);
+            }
+            if(keyEvent.keyCode == 57) { // 9
+                trySelectField(2,2, playerMarker);
+            }
+        }
+    }
+    else {
+        // restart();
+    }    
+}
