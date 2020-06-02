@@ -7,10 +7,12 @@ let ambientLight;
 let fontLoader;
 let textGameEnd;
 
+let playerScore = 0;
+let enemyScore = 0;
+
 const markerGeometry = new THREE.DodecahedronGeometry();
 const playerMarkerMaterial = new THREE.MeshLambertMaterial( {color: 0x5dbcd2});
 const enemyMarkerMaterial = new THREE.MeshLambertMaterial( {color: 0xc7382e});
-
 
 let playfield = []; // 3x3 Matrix, initialized with 0s for empty spaces
 const empty = 0;
@@ -22,6 +24,8 @@ const playfieldScale = 2.5;
 let objectsInPlayfield = []; // Holds the 3D representations of the markers
 let playfieldBarriers = [];
 
+// Global game state
+// Also set in startGame()
 let hasFinished = false;
 let playerTurn = true;
 let numberOfMovesTaken = 0;
@@ -55,15 +59,13 @@ function init() {
     scene.add(pointLight);
 
     // Playfield
-    addPlayfieldBarriers();
+    createPlayfieldBarriers();
 
-    // Populate playfield with empty
-    for(let i = 0; i<3; i++) {
-        playfield[i] = [];
-        for(let j = 0; j<3; j++) {
-            playfield[i][j] = empty;
-        }
-    }
+    fontLoader =  new THREE.FontLoader();
+
+
+    startGame();
+    
 
 
     // ui = new ThreeUI(renderer.domElement, 720);
@@ -80,11 +82,21 @@ function init() {
     // text.anchor.y = ThreeUI.anchors.center;
 
     // text.parent = rectangle;
-
-
-    fontLoader =  new THREE.FontLoader();
 }
 
+function startGame() {
+    hasFinished = false;
+    playerTurn = true;
+    numberOfMovesTaken = 0; 
+
+    // Populate playfield with empty
+    for(let i = 0; i<3; i++) {
+        playfield[i] = [];
+        for(let j = 0; j<3; j++) {
+            playfield[i][j] = empty;
+        }
+    }
+}
 
 function gameLoop() {
     requestAnimationFrame(gameLoop);
@@ -116,7 +128,7 @@ function onResize() {
     camera.updateProjectionMatrix();
 }
 
-function addPlayfieldBarriers() {
+function createPlayfieldBarriers() {
     playfieldBarriers[0] = new PlayfieldBarrier();
     playfieldBarriers[0].mesh.scale.x = 0.01;
     playfieldBarriers[0].mesh.scale.y = 6;
@@ -165,6 +177,16 @@ function onMouseDown(event) {
         restartGame();
     }
 }
+
+function restartGame() {
+    for(let i = 0; i<objectsInPlayfield.length; i++) {
+        scene.remove(objectsInPlayfield[i].mesh);
+    }
+    scene.remove(textGameEnd);
+
+    startGame();
+}
+
 
 function validateClick(mouse) {
     // Here I went with the first solution that came to mind after playing around with the event clicks.
@@ -319,7 +341,8 @@ function checkForDraw() {
 }
 
 function playerWins() {
-    console.log("Player won");
+    playerScore++;
+    console.log(`Player won, score ${playerScore} x ${enemyScore}`);
     fontLoader.load('fonts/helvetiker_regular.typeface.json', function ( font ) {
         let textGeometry = new THREE.TextGeometry( "WIN", {
             font: font,
@@ -337,20 +360,21 @@ function playerWins() {
           { color: 0xffffff, specular: 0xffffff }
         );
       
-        let textMesh = new THREE.Mesh( textGeometry, textMaterial );
-        textMesh.position.x = -2;
-        textMesh.position.y = -0.5;
-        textMesh.position.z = 1;
+        textGameEnd = new THREE.Mesh( textGeometry, textMaterial );
+        textGameEnd.position.x = -2;
+        textGameEnd.position.y = -0.5;
+        textGameEnd.position.z = 1;
 
-        textMesh.scale.x = 0.1;
-        textMesh.scale.y = 0.1;
-        textMesh.scale.z = 0.1;
-        scene.add( textMesh );
+        textGameEnd.scale.x = 0.1;
+        textGameEnd.scale.y = 0.1;
+        textGameEnd.scale.z = 0.1;
+        scene.add( textGameEnd );
       });
 }
 
 function enemyWins() {
-    console.log("Enemy won");
+    enemyScore++;
+    console.log(`Enemy won, score ${playerScore} x ${enemyScore}`);
     fontLoader.load('fonts/helvetiker_regular.typeface.json', function ( font ) {
         let textGeometry = new THREE.TextGeometry( "LOSE", {
             font: font,
@@ -368,20 +392,20 @@ function enemyWins() {
           { color: 0xffffff, specular: 0xffffff }
         );
       
-        let textMesh = new THREE.Mesh( textGeometry, textMaterial );
-        textMesh.position.x = -1.7;
-        textMesh.position.y = 0;
-        textMesh.position.z = 1;
+        textGameEnd = new THREE.Mesh( textGeometry, textMaterial );
+        textGameEnd.position.x = -1.7;
+        textGameEnd.position.y = 0;
+        textGameEnd.position.z = 1;
 
-        textMesh.scale.x = 0.1;
-        textMesh.scale.y = 0.1;
-        textMesh.scale.z = 0.1;
-        scene.add( textMesh );
+        textGameEnd.scale.x = 0.1;
+        textGameEnd.scale.y = 0.1;
+        textGameEnd.scale.z = 0.1;
+        scene.add( textGameEnd );
       });
 }
 
 function gameDraw() {
-    console.log("Draw");
+    console.log(`Draw,  score ${playerScore} x ${enemyScore}`);
     fontLoader.load('fonts/helvetiker_regular.typeface.json', function ( font ) {
         let textGeometry = new THREE.TextGeometry( "DRAW", {
             font: font,
@@ -399,15 +423,15 @@ function gameDraw() {
           { color: 0xffffff, specular: 0xffffff }
         );
       
-        let textMesh = new THREE.Mesh( textGeometry, textMaterial );
-        textMesh.position.x = -1.9;
-        textMesh.position.y = 0;
-        textMesh.position.z = 1;
+        textGameEnd = new THREE.Mesh( textGeometry, textMaterial );
+        textGameEnd.position.x = -1.9;
+        textGameEnd.position.y = 0;
+        textGameEnd.position.z = 1;
 
-        textMesh.scale.x = 0.1;
-        textMesh.scale.y = 0.1;
-        textMesh.scale.z = 0.1;
-        scene.add( textMesh );
+        textGameEnd.scale.x = 0.1;
+        textGameEnd.scale.y = 0.1;
+        textGameEnd.scale.z = 0.1;
+        scene.add( textGameEnd );
       });
 }
 
